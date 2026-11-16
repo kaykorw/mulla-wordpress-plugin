@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+/.github export-ignore
+/.wp-env.json export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/.distignore export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/bin export-ignore
+/tests export-ignore
+/phpstan.neon.dist export-ignore
+/phpunit.xml.dist export-ignore

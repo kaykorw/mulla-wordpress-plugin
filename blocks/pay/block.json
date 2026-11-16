@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "mulla/pay",
+    "title": "Mulla Pay",
+    "category": "widgets",
+    "icon": "money-alt",
+    "description": "A Mobile Money payment form (MTN MoMo & Airtel Money). Payments appear under Mulla → Payments.",
+    "keywords": ["payment", "momo", "mobile money", "donate", "mulla"],
+    "textdomain": "mulla-payments",
+    "attributes": {
+        "amount": { "type": "string", "default": "" },
+        "reason": { "type": "string", "default": "Payment" },
+        "button": { "type": "string", "default": "Pay" },
+        "min": { "type": "string", "default": "100" }
+    },
+    "supports": { "html": false, "align": ["wide", "full"] },
+    "editorScript": "file:./index.js"
+}

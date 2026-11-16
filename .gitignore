@@ -1,0 +1,10 @@
+/vendor/
+/vendor-prefixed/
+/composer.lock
+/build/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/phpstan.neon
+/phpunit.xml
+/node_modules/
+/.wp-env.override.json

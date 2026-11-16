@@ -1,0 +1,17 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+        - mulla-payments.php
+        - uninstall.php
+    scanFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor-prefixed/autoload.php
+    scanDirectories:
+        - vendor-prefixed
+    bootstrapFiles:
+        - tests/phpstan-constants.php
+    treatPhpDocTypesAsCertain: false

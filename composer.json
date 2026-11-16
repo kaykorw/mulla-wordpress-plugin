@@ -1,0 +1,61 @@
+{
+    "name": "mulla/mulla-wordpress",
+    "description": "Mulla Payments for WordPress and WooCommerce: MTN MoMo & Airtel Money in Rwanda.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/mulla/mulla-wordpress",
+    "require": {
+        "php": ">=8.1",
+        "mulla/mulla-php": "^0.0.1 || dev-main"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "php-stubs/woocommerce-stubs": "^9.0",
+        "phpstan/phpstan": "^1.11",
+        "phpunit/phpunit": "^10.5",
+        "szepeviktor/phpstan-wordpress": "^1.3"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../mulla-php",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "MullaPayments\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MullaPayments\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "prefix-namespaces": "@php bin/prefix-sdk.php",
+        "post-install-cmd": [
+            "@prefix-namespaces"
+        ],
+        "post-update-cmd": [
+            "@prefix-namespaces"
+        ],
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=2G",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "check": [
+            "@cs",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": false
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
