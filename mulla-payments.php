@@ -13,9 +13,8 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       mulla-payments
- * Domain Path:       /languages
  * WC requires at least: 8.0
- * WC tested up to:   9.9
+ * WC tested up to:   11.3
  *
  * @package MullaPayments
  */

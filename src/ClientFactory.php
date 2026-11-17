@@ -35,11 +35,11 @@ final class ClientFactory
         }
 
         if (!$this->settings->isConfigured()) {
-            throw new NotConfiguredException(sprintf(
+            throw new NotConfiguredException(esc_html(sprintf(
                 /* translators: %s: test or live */
                 __('Mulla is not configured: add your %s secret key in Settings → Mulla Payments.', 'mulla-payments'),
                 $this->settings->mode(),
-            ));
+            )));
         }
 
         $options = [
@@ -58,7 +58,7 @@ final class ClientFactory
         try {
             return $this->client = new MullaClient($this->settings->secretKey(), $options);
         } catch (InvalidArgumentException $e) {
-            throw new NotConfiguredException($e->getMessage(), 0, $e);
+            throw new NotConfiguredException(esc_html($e->getMessage()), 0, $e);
         }
     }
 

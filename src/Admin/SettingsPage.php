@@ -127,7 +127,8 @@ final class SettingsPage
                 $total,
             ));
         } catch (MullaException $e) {
-            $this->notice('error', __('Connection failed:', 'mulla-payments') . ' ' . $e->getMessage());
+            // Messages may arrive HTML-escaped; renderNotice() escapes once on output.
+            $this->notice('error', __('Connection failed:', 'mulla-payments') . ' ' . wp_specialchars_decode($e->getMessage(), ENT_QUOTES));
         }
 
         $this->back();
@@ -160,7 +161,7 @@ final class SettingsPage
             /* translators: %s: webhook URL */
             $this->notice('success', sprintf(__('Webhook set up: Mulla will notify %s.', 'mulla-payments'), $url));
         } catch (MullaException $e) {
-            $this->notice('error', __('Could not set up the webhook:', 'mulla-payments') . ' ' . $e->getMessage());
+            $this->notice('error', __('Could not set up the webhook:', 'mulla-payments') . ' ' . wp_specialchars_decode($e->getMessage(), ENT_QUOTES));
         }
 
         $this->back();

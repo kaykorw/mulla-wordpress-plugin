@@ -2,7 +2,7 @@
 Contributors: kaykorw
 Tags: mobile money, momo, mtn, airtel, woocommerce
 Requires at least: 6.4
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.0.1
 License: GPL-2.0-or-later
@@ -87,7 +87,16 @@ Only what a payment needs: the phone number, the amount, a short description suc
 
 == External services ==
 
-This plugin sends payment requests to the Mulla API (sandbox in test mode, production in live mode) when a customer pays, when a pending payment is checked, and when you use **Test connection** or **Set up webhook**. It sends the customer's phone number, the amount, the currency, a payment description, the order or form reference and your site address. Nothing is sent before a customer submits a payment or an administrator clicks one of those buttons.
+This plugin relies on Mulla, a third-party mobile money payment service, to take payments. It cannot work without a Mulla account.
+
+**Mulla API** (`mfs.kayko.dev` in test mode, `core.mulla.app` in live mode). The plugin calls it when a customer starts a payment, when it checks the status of a pending payment, and when an administrator clicks **Test connection** or **Set up webhook**. It sends the amount, the currency, a payment description (such as "Order 123 at Your Shop"), the order or form reference and your site address; with the "phone number on your site" flow it also sends the customer's phone number and network. Nothing is sent before a customer submits a payment or an administrator clicks one of those buttons.
+
+**Mulla checkout page** (the address returned by the Mulla API, e.g. `mula-web.kayko.dev` in test mode). With the default "Mulla checkout page" flow, customers are sent there to enter their phone number and approve the payment, then return to your site.
+
+Mulla also calls your site's webhook URL (`/wp-json/mulla/v1/webhook`) to report payment results.
+
+* Mulla terms of service: https://mulla.app/legal/terms-of-service
+* Mulla privacy policy: https://mulla.app/legal/privacy-policy
 
 == Changelog ==
 

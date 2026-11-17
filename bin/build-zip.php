@@ -32,6 +32,11 @@ if (!preg_match('/^Stable tag:\s*(\S+)/m', (string) file_get_contents($root . '/
     exit(1);
 }
 
+if (preg_match('/\b(TERMS_URL|PRIVACY_URL)\b/', (string) file_get_contents($root . '/readme.txt'), $placeholder)) {
+    fwrite(STDERR, "build-zip: readme.txt still contains the placeholder {$placeholder[1]}. Add the real Mulla link first.\n");
+    exit(1);
+}
+
 if (!is_dir($root . '/build') && !mkdir($root . '/build') && !is_dir($root . '/build')) {
     fwrite(STDERR, "build-zip: cannot create build/.\n");
     exit(1);

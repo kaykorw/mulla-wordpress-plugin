@@ -28,7 +28,9 @@ final class Logger
             return;
         }
 
-        if ($level !== 'debug' || $this->settings->debug()) {
+        // Without WooCommerce, only log when the site owner enabled debug logging in wp-config.php.
+        if (defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- opt-in via WP_DEBUG_LOG.
             error_log('[mulla-payments] ' . strtoupper($level) . ' ' . $message . ($context !== [] ? ' ' . wp_json_encode($context) : ''));
         }
     }

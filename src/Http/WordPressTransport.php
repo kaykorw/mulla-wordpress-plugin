@@ -39,10 +39,10 @@ final class WordPressTransport implements TransportInterface
             $notSent = (bool) preg_match('/could not resolve|resolve host|connection refused|failed to connect|couldn\'t connect/i', $message);
 
             throw new ConnectionException(
-                sprintf('Could not reach Mulla at %s: %s', Redactor::url($request->url), $message),
+                esc_html(sprintf('Could not reach Mulla at %s: %s', Redactor::url($request->url), $message)),
                 0,
                 null,
-                !$notSent,
+                (bool) !$notSent,
             );
         }
 
