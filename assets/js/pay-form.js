@@ -5,6 +5,7 @@
 	'use strict';
 
 	var MAX_WAIT_MS = 12 * 60 * 1000;
+	var returned = false; // only one form on the page shows the result of a hosted-checkout return
 
 	function setup(form) {
 		var button = form.querySelector('button[type="submit"]');
@@ -40,6 +41,24 @@
 				});
 		}
 
+		function statusUrl(payment, token) {
+			return form.getAttribute('data-endpoint') + '/' + encodeURIComponent(payment) + '?token=' + encodeURIComponent(token);
+		}
+
+		// Back from Mulla's checkout page: show the result. The URL proves nothing, so ask the server.
+		var params = new URLSearchParams(window.location.search);
+		if (form.getAttribute('data-flow') === 'redirect' && params.get('mulla_payment') && params.get('mulla_token') && !returned) {
+			returned = true;
+			form.scrollIntoView({ block: 'center' });
+			if (params.get('mulla_cancelled')) {
+				show('failed', form.getAttribute('data-cancelled-label') || 'Payment cancelled.');
+			} else {
+				button.disabled = true;
+				show('pending', '…');
+				follow(statusUrl(params.get('mulla_payment'), params.get('mulla_token')), Date.now());
+			}
+		}
+
 		form.addEventListener('submit', function (event) {
 			event.preventDefault();
 			if (!form.reportValidity()) return;
@@ -65,8 +84,13 @@
 						button.disabled = false;
 						return;
 					}
+					if (result.json.redirect) {
+						// Hosted checkout: Mulla's page collects the number, then sends the visitor back here.
+						window.location.assign(result.json.redirect);
+						return;
+					}
 					show('pending', result.json.message);
-					var url = form.getAttribute('data-endpoint') + '/' + result.json.payment + '?token=' + encodeURIComponent(result.json.token);
+					var url = statusUrl(result.json.payment, result.json.token);
 					window.setTimeout(function () { follow(url, Date.now()); }, 4000);
 				})
 				.catch(function () {

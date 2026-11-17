@@ -35,6 +35,17 @@
 		return null;
 	}
 
+	// Hosted checkout: nothing to collect here, Mulla's page asks for the network and number.
+	function RedirectNotice() {
+		return el(
+			'div',
+			{ className: 'mulla-fields' },
+			settings.description ? el('p', null, decode(settings.description)) : null,
+			el('p', { className: 'mulla-redirect-note' }, i18n.redirectNote),
+			settings.testMode ? el('p', { className: 'mulla-test-mode' }, i18n.testMode) : null
+		);
+	}
+
 	function Fields(props) {
 		var billingPhone = (props.billing && props.billing.billingAddress && props.billing.billingAddress.phone) || '';
 		var phoneState = useState(billingPhone);
@@ -116,8 +127,8 @@
 		name: 'mulla',
 		label: label,
 		ariaLabel: title,
-		content: el(Fields),
-		edit: el(Fields),
+		content: el(settings.flow === 'onsite' ? Fields : RedirectNotice),
+		edit: el(settings.flow === 'onsite' ? Fields : RedirectNotice),
 		canMakePayment: function () { return true; },
 		supports: { features: settings.supports || ['products'] },
 	});

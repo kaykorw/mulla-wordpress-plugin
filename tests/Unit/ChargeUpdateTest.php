@@ -53,10 +53,14 @@ final class ChargeUpdateTest extends TestCase
             'amount' => 1200,
             'reference' => 'REF2',
             'failure_message' => 'Insufficient balance',
+            'phone_number' => '250788000000',
+            'provider' => 'MTN_RW',
         ]));
 
         self::assertNotNull($update);
         self::assertSame('api', $update->source);
+        self::assertSame('250788000000', $update->phoneNumber);
+        self::assertSame(\MullaPayments\Vendor\Mulla\Enums\Provider::MTN_RW, $update->provider);
         self::assertSame('Insufficient balance', $update->failureMessage);
         self::assertTrue($update->isFinal());
         self::assertFalse($update->isSuccessful());

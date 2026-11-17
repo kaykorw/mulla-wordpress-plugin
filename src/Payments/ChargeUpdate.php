@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MullaPayments\Payments;
 
 use MullaPayments\Vendor\Mulla\Enums\ChargeStatus;
+use MullaPayments\Vendor\Mulla\Enums\Provider;
 use MullaPayments\Vendor\Mulla\Models\Charge;
 use MullaPayments\Vendor\Mulla\Webhooks\Event;
 
@@ -22,6 +23,8 @@ final class ChargeUpdate
         public readonly ?string $transactionId,
         public readonly string $source,
         public readonly ?string $failureMessage = null,
+        public readonly ?string $phoneNumber = null,
+        public readonly ?Provider $provider = null,
     ) {}
 
     public static function fromEvent(Event $event): ?self
@@ -41,7 +44,7 @@ final class ChargeUpdate
             return null;
         }
 
-        return new self($charge->id, $charge->status, $charge->amount, $charge->reference, null, 'api', $charge->failureMessage);
+        return new self($charge->id, $charge->status, $charge->amount, $charge->reference, null, 'api', $charge->failureMessage, $charge->phoneNumber, $charge->provider);
     }
 
     public function isFinal(): bool

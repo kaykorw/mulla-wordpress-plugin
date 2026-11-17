@@ -60,6 +60,7 @@ final class BlocksIntegration extends AbstractPaymentMethodType
             'title' => $this->gateway->title,
             'description' => $this->gateway->description,
             'icon' => $this->gateway->icon,
+            'flow' => $this->gateway->flow(),
             'providers' => $providers,
             'testMode' => !$this->pluginSettings->isLive(),
             'supports' => array_values(array_filter($this->gateway->supports, [$this->gateway, 'supports'])),
@@ -68,6 +69,7 @@ final class BlocksIntegration extends AbstractPaymentMethodType
                 'phone' => __('Mobile Money number', 'mulla-payments'),
                 'invalidPhone' => __('Enter a valid Rwandan Mobile Money number, e.g. 078 800 0000.', 'mulla-payments'),
                 'testMode' => __('Test mode: no real money is taken.', 'mulla-payments'),
+                'redirectNote' => __('You will be taken to a secure Mulla page to choose MTN or Airtel and approve the payment.', 'mulla-payments'),
             ],
         ];
     }

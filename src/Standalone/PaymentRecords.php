@@ -39,8 +39,12 @@ final class PaymentRecords
         add_action('manage_' . self::POST_TYPE . '_posts_custom_column', [$this, 'column'], 10, 2);
     }
 
-    /** @return int post id */
-    public function create(int $amount, string $phone, Provider $provider, string $reason, string $payer, int $pageId): int
+    /**
+     * Phone and provider are empty for hosted-checkout payments until Mulla reports them.
+     *
+     * @return int post id
+     */
+    public function create(int $amount, string $phone, ?Provider $provider, string $reason, string $payer, int $pageId, string $flow): int
     {
         $id = wp_insert_post([
             'post_type' => self::POST_TYPE,
@@ -48,9 +52,10 @@ final class PaymentRecords
             'post_title' => $reason,
             'meta_input' => [
                 '_mulla_status' => 'CREATED',
+                '_mulla_flow' => $flow,
                 '_mulla_amount' => $amount,
                 '_mulla_phone' => $phone,
-                '_mulla_provider' => $provider->value,
+                '_mulla_provider' => $provider?->value ?? '',
                 '_mulla_payer' => $payer,
                 '_mulla_page' => $pageId,
                 '_mulla_access_token' => wp_generate_password(32, false),

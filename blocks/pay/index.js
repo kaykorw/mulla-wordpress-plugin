@@ -11,6 +11,7 @@
 	var useBlockProps = wp.blockEditor.useBlockProps;
 	var PanelBody = wp.components.PanelBody;
 	var TextControl = wp.components.TextControl;
+	var SelectControl = wp.components.SelectControl;
 	var ServerSideRender = wp.serverSideRender;
 
 	wp.blocks.registerBlockType('mulla/pay', {
@@ -42,7 +43,17 @@
 						field('reason', __('Reason', 'mulla-payments'), __('Shown to the payer and on the Mulla payment.', 'mulla-payments')),
 						field('amount', __('Amount (RWF)', 'mulla-payments'), __('Leave empty to let the payer choose.', 'mulla-payments'), 'number'),
 						field('min', __('Minimum amount (RWF)', 'mulla-payments'), __('Used when the payer chooses the amount.', 'mulla-payments'), 'number'),
-						field('button', __('Button text', 'mulla-payments'))
+						field('button', __('Button text', 'mulla-payments')),
+						el(SelectControl, {
+							label: __('Payment flow', 'mulla-payments'),
+							value: a.flow,
+							options: [
+								{ value: 'redirect', label: __('Mulla checkout page', 'mulla-payments') },
+								{ value: 'onsite', label: __('Phone number on this page', 'mulla-payments') },
+							],
+							help: __('Mulla checkout page: the payer is sent to Mulla to pay, then returns here.', 'mulla-payments'),
+							onChange: function (value) { props.setAttributes({ flow: value }); },
+						})
 					)
 				),
 				el(ServerSideRender, { block: 'mulla/pay', attributes: a })

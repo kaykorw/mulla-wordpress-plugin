@@ -21,14 +21,21 @@ use WC_Order;
 use WC_Payment_Gateway;
 
 /**
- * "Mobile Money (MTN / Airtel)" payment method.
+ * "Mobile Money (MTN / Airtel)" payment method, with two flows:
  *
- * The customer chooses the network and enters their number; Mulla sends a payment prompt to the
- * phone. The order stays "pending payment" until the webhook (or the status poller) confirms it.
+ * - redirect (default): the customer is sent to Mulla's hosted checkout page, chooses the network,
+ *   enters their number and approves there, then comes back to the order-received page.
+ * - onsite: the customer chooses the network and enters their number at checkout; Mulla sends the
+ *   payment prompt straight to the phone.
+ *
+ * Either way the order stays "pending payment" until the webhook (or the status poller) confirms
+ * it. The return to the shop proves nothing on its own.
  */
 final class Gateway extends WC_Payment_Gateway
 {
     public const ID = 'mulla';
+    public const FLOW_REDIRECT = 'redirect';
+    public const FLOW_ONSITE = 'onsite';
 
     public function __construct(
         private readonly string $file,
@@ -38,7 +45,6 @@ final class Gateway extends WC_Payment_Gateway
         private readonly Logger $logger,
     ) {
         $this->id = self::ID;
-        $this->has_fields = true;
         $this->method_title = __('Mulla (MTN MoMo & Airtel Money)', 'mulla-payments');
         $this->method_description = sprintf(
             /* translators: %s: link to the Mulla settings page */
@@ -54,6 +60,7 @@ final class Gateway extends WC_Payment_Gateway
         $this->title = (string) $this->get_option('title');
         $this->description = (string) $this->get_option('description');
         $this->enabled = (string) $this->get_option('enabled');
+        $this->has_fields = $this->flow() === self::FLOW_ONSITE;
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, function (): void {
             $this->process_admin_options();
@@ -81,14 +88,30 @@ final class Gateway extends WC_Payment_Gateway
                 'type' => 'textarea',
                 'default' => __('Pay with MTN Mobile Money or Airtel Money. You will receive a prompt on your phone to approve the payment.', 'mulla-payments'),
             ],
+            'flow' => [
+                'title' => __('Payment flow', 'mulla-payments'),
+                'type' => 'select',
+                'options' => [
+                    self::FLOW_REDIRECT => __('Mulla checkout page (recommended)', 'mulla-payments'),
+                    self::FLOW_ONSITE => __('Phone number on your checkout', 'mulla-payments'),
+                ],
+                'default' => self::FLOW_REDIRECT,
+                'description' => __('Mulla checkout page: customers are sent to a secure Mulla page to choose their network and approve, then return to your shop. Phone number on your checkout: customers enter their number on your checkout page and get the prompt directly.', 'mulla-payments'),
+            ],
             'providers' => [
                 'title' => __('Networks', 'mulla-payments'),
                 'type' => 'multiselect',
                 'class' => 'wc-enhanced-select',
                 'options' => self::providerOptions(),
                 'default' => array_keys(self::providerOptions()),
+                'description' => __('Used by the "Phone number on your checkout" flow. The Mulla checkout page shows the networks enabled on your Mulla account.', 'mulla-payments'),
             ],
         ];
+    }
+
+    public function flow(): string
+    {
+        return $this->get_option('flow', self::FLOW_REDIRECT) === self::FLOW_ONSITE ? self::FLOW_ONSITE : self::FLOW_REDIRECT;
     }
 
     /** @return array<string, string> provider value => label for the networks enabled in the settings */
@@ -114,6 +137,11 @@ final class Gateway extends WC_Payment_Gateway
         }
         if (!$this->pluginSettings->isLive()) {
             echo '<p class="mulla-test-mode">' . esc_html__('Test mode: no real money is taken.', 'mulla-payments') . '</p>';
+        }
+        if ($this->flow() === self::FLOW_REDIRECT) {
+            echo '<p class="mulla-redirect-note">' . esc_html__('You will be taken to a secure Mulla page to choose MTN or Airtel and approve the payment.', 'mulla-payments') . '</p>';
+
+            return;
         }
 
         $phone = WC()->customer ? (string) WC()->customer->get_billing_phone() : '';
@@ -144,6 +172,10 @@ final class Gateway extends WC_Payment_Gateway
 
     public function validate_fields(): bool
     {
+        if ($this->flow() === self::FLOW_REDIRECT) {
+            return true; // Mulla's checkout page collects and validates the number.
+        }
+
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the checkout nonce.
         $phone = Phone::normalize(sanitize_text_field(wp_unslash((string) ($_POST['mulla_phone'] ?? ''))));
         if ($phone === null) {
@@ -172,6 +204,10 @@ final class Gateway extends WC_Payment_Gateway
             return ['result' => 'failure'];
         }
 
+        if ($this->flow() === self::FLOW_REDIRECT) {
+            return $this->startHostedCheckout($order);
+        }
+
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the checkout nonce.
         $phone = Phone::normalize(sanitize_text_field(wp_unslash((string) ($_POST['mulla_phone'] ?? ''))));
         $provider = $phone !== null ? $this->postedProvider($phone) : null;
@@ -193,21 +229,12 @@ final class Gateway extends WC_Payment_Gateway
             $charge = $this->clients->client()->charges->initiate([
                 'provider' => $provider,
                 'phone_number' => $phone,
-                'amount' => (int) round((float) $order->get_total()),
-                'currency' => 'RWF',
-                'reason' => mb_substr(sprintf(
-                    /* translators: 1: order number, 2: site name */
-                    __('Order %1$s at %2$s', 'mulla-payments'),
-                    $order->get_order_number(),
-                    wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES),
-                ), 0, 120),
-                'application' => 'woocommerce',
-                'metadata' => ['order_id' => $order->get_id(), 'order_number' => $order->get_order_number(), 'site' => home_url()],
-            ], ['idempotency_key' => $key]);
+            ] + $this->chargeFields($order), ['idempotency_key' => $key]);
         } catch (MullaException $e) {
             return $this->failure($order, $e);
         }
 
+        $order->update_meta_data(WooCommerceModule::META_FLOW, self::FLOW_ONSITE);
         $order->update_meta_data(WooCommerceModule::META_CHARGE_ID, $charge->id);
         $order->update_meta_data(WooCommerceModule::META_CHARGE_STATUS, $charge->status?->value ?? 'PENDING');
         $order->add_order_note(sprintf(
@@ -225,6 +252,82 @@ final class Gateway extends WC_Payment_Gateway
         $cart?->empty_cart();
 
         return ['result' => 'success', 'redirect' => $this->get_return_url($order)];
+    }
+
+    /**
+     * Sends the customer to Mulla's hosted checkout. The cart is kept until the order-received page
+     * (WooCommerce empties it there), so a customer who cancels returns to a full cart.
+     *
+     * @return array{result: string, redirect?: string}
+     */
+    private function startHostedCheckout(WC_Order $order): array
+    {
+        // Back button / double submit while a session is still open: reuse it instead of creating another charge.
+        $existingUrl = (string) $order->get_meta(WooCommerceModule::META_CHECKOUT_URL);
+        if ($existingUrl !== ''
+            && $order->get_meta(WooCommerceModule::META_CHARGE_STATUS) === 'PENDING'
+            && (int) $order->get_meta(WooCommerceModule::META_CHECKOUT_EXPIRES) > time() + 60
+        ) {
+            return ['result' => 'success', 'redirect' => $existingUrl];
+        }
+
+        $key = Uuid::v4();
+        $order->update_meta_data(WooCommerceModule::META_IDEMPOTENCY_KEY, $key);
+
+        try {
+            $session = $this->clients->client()->charges->createCheckout([
+                // Return URLs are not trusted: the order-received page asks Mulla for the real status.
+                'success_url' => $this->get_return_url($order),
+                'cancel_url' => $order->get_cancel_order_url_raw(),
+            ] + $this->chargeFields($order), ['idempotency_key' => $key]);
+        } catch (MullaException $e) {
+            return $this->failure($order, $e);
+        }
+
+        if ($session->charge === null || $session->checkoutUrl === null) {
+            $this->logger->error('Checkout session without charge or URL.', ['order' => $order->get_id(), 'session' => $session->id]);
+            wc_add_notice(__('The payment service is temporarily unavailable. Please try again in a minute.', 'mulla-payments'), 'error');
+            $order->save();
+
+            return ['result' => 'failure'];
+        }
+
+        $order->update_meta_data(WooCommerceModule::META_FLOW, self::FLOW_REDIRECT);
+        $order->update_meta_data(WooCommerceModule::META_CHARGE_ID, $session->charge);
+        $order->update_meta_data(WooCommerceModule::META_CHARGE_STATUS, $session->status?->value ?? 'PENDING');
+        $order->update_meta_data(WooCommerceModule::META_CHECKOUT_URL, $session->checkoutUrl);
+        $order->update_meta_data(WooCommerceModule::META_CHECKOUT_EXPIRES, (string) ($session->expiresAt?->getTimestamp() ?? time() + 600));
+        $order->add_order_note(sprintf(
+            /* translators: %s: Mulla reference */
+            __('Customer sent to the Mulla checkout page (reference %s). Waiting for the payment.', 'mulla-payments'),
+            (string) ($session->reference ?? $session->charge),
+        ));
+        $order->save();
+
+        $this->poller->schedule($session->charge);
+
+        return ['result' => 'success', 'redirect' => $session->checkoutUrl];
+    }
+
+    /**
+     * Fields shared by direct charges and checkout sessions.
+     *
+     * @return array{amount: int, currency: string, reason: string, application: string, metadata: array<string, mixed>}
+     */
+    private function chargeFields(WC_Order $order): array
+    {
+        return [
+            'amount' => (int) round((float) $order->get_total()),
+            'currency' => 'RWF',
+            'reason' => mb_substr(sprintf(
+                /* translators: 1: order number, 2: site name */
+                __('Order %1$s at %2$s', 'mulla-payments'),
+                $order->get_order_number(),
+                wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES),
+            ), 0, 120),
+            'application' => 'woocommerce',
+            'metadata' => ['order_id' => $order->get_id(), 'order_number' => $order->get_order_number(), 'site' => home_url()],
+        ];
     }
 
     /** @return array{result: string} */

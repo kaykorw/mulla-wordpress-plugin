@@ -12,7 +12,8 @@
         "amount": { "type": "string", "default": "" },
         "reason": { "type": "string", "default": "Payment" },
         "button": { "type": "string", "default": "Pay" },
-        "min": { "type": "string", "default": "100" }
+        "min": { "type": "string", "default": "100" },
+        "flow": { "type": "string", "enum": ["redirect", "onsite"], "default": "redirect" }
     },
     "supports": { "html": false, "align": ["wide", "full"] },
     "editorScript": "file:./index.js"

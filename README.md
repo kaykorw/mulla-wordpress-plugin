@@ -9,11 +9,19 @@ Merchant documentation (installation, FAQ) is in [readme.txt](readme.txt). This 
 
 ## How a payment works
 
-1. The customer picks the network and enters their number.
-2. The plugin calls `charges->initiate` with a fresh idempotency key; Mulla sends a prompt to the phone.
-3. The order stays *Pending payment*; the customer sees a waiting screen that polls `GET /wp-json/mulla/v1/orders/{id}`.
-4. Mulla calls `POST /wp-json/mulla/v1/webhook` (HMAC-SHA512 signed). WP-Cron also checks the charge after 1, 3, 6, 11 and 21 minutes in case the webhook is missed.
-5. Both paths produce a `ChargeUpdate` and fire `mulla_payments_charge_updated`. The WooCommerce module completes the order (or puts it on hold when the paid amount does not match); the form module updates the payment record.
+Two flows, set per gateway (WooCommerce → Settings → Payments → Mulla → *Payment flow*) and per form (`flow="redirect|onsite"`):
+
+| | Redirect (default) | On-site |
+|---|---|---|
+| Collects network + number | Mulla's hosted checkout page | Your checkout / form |
+| API call | `charges->createCheckout` (`success_url` = order-received page, `cancel_url` = WooCommerce cancel-order URL) | `charges->initiate` |
+| Cart | Kept until the order-received page, so cancelling returns to a full cart | Emptied after the prompt is sent |
+| Retry while pending | Reuses the stored checkout URL until it expires | No new prompt while one is pending |
+
+1. The plugin starts the charge with a fresh idempotency key and stores the charge ID on the order (or form payment record).
+2. The order stays *Pending payment*. The customer sees a waiting screen that polls `GET /wp-json/mulla/v1/orders/{id}`, which asks Mulla directly at most every 10 seconds. Returning to `success_url` proves nothing on its own.
+3. Mulla calls `POST /wp-json/mulla/v1/webhook` (HMAC-SHA512 signed). WP-Cron also checks the charge after 1, 3, 6, 11 and 21 minutes in case the webhook is missed.
+4. Both paths produce a `ChargeUpdate` and fire `mulla_payments_charge_updated`. The WooCommerce module completes the order (or puts it on hold when the paid amount does not match); the form module updates the payment record.
 
 Webhook handling is idempotent: replays and webhook + poller races are harmless.
 

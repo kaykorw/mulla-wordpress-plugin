@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 - WooCommerce payment method "Mobile Money (MTN / Airtel)" for the classic and block checkout, with HPOS support.
+- Two payment flows: Mulla hosted checkout page (default) or phone number on your own checkout/form.
 - "Approve on your phone" waiting screen that follows the payment live and moves the order on when it settles.
 - Mulla Pay block and `[mulla_pay]` shortcode for sites without WooCommerce; payments listed under Mulla → Payments.
 - Signed webhook endpoint (`/wp-json/mulla/v1/webhook`) plus WP-Cron status polling as a fallback.

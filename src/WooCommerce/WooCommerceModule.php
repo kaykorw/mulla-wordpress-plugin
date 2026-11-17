@@ -25,6 +25,10 @@ final class WooCommerceModule
     public const META_CHARGE_STATUS = '_mulla_charge_status';
     public const META_IDEMPOTENCY_KEY = '_mulla_idempotency_key';
     public const META_LAST_CHECK = '_mulla_last_check';
+    public const META_FLOW = '_mulla_flow';
+    /** Hosted checkout URL (contains the session token): reused if the customer comes back before it expires. */
+    public const META_CHECKOUT_URL = '_mulla_checkout_url';
+    public const META_CHECKOUT_EXPIRES = '_mulla_checkout_expires';
 
     private ?Gateway $gateway = null;
 
@@ -68,6 +72,11 @@ final class WooCommerceModule
 
         $order->update_meta_data(self::META_CHARGE_STATUS, $update->status->value);
 
+        if ($update->isFinal()) {
+            // The session can't be reused once the charge settled.
+            $order->delete_meta_data(self::META_CHECKOUT_URL);
+        }
+
         if ($order->is_paid()) {
             $order->save();
 
@@ -99,7 +108,12 @@ final class WooCommerceModule
             return;
         }
 
-        if ($update->isFinal() && $order->has_status(['pending', 'on-hold'])) {
+        if ($update->isFinal() && $order->has_status(['pending', 'on-hold', 'cancelled'])) {
+            if ($order->has_status('cancelled')) {
+                $order->save(); // The customer cancelled on the Mulla page; the order is already closed.
+
+                return;
+            }
             $reason = $update->status->value === 'EXPIRED'
                 ? __('The customer did not approve the payment in time.', 'mulla-payments')
                 : ($update->failureMessage ?? __('The payment was declined or failed.', 'mulla-payments'));
@@ -185,6 +199,10 @@ final class WooCommerceModule
         }
         if ($order->has_status('on-hold')) {
             return ['state' => 'review', 'message' => __('We received your payment and are reviewing it. You will get an email shortly.', 'mulla-payments')];
+        }
+
+        if ($order->get_meta(self::META_FLOW) === Gateway::FLOW_REDIRECT) {
+            return ['state' => 'pending', 'message' => __('Confirming your payment with Mulla… If you have not approved the prompt on your phone yet, do it now.', 'mulla-payments')];
         }
 
         return ['state' => 'pending', 'message' => __('Approve the payment on your phone: check for the Mobile Money prompt and enter your PIN.', 'mulla-payments')];

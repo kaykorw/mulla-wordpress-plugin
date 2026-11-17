@@ -12,12 +12,17 @@ Accept MTN Mobile Money and Airtel Money in Rwanda: a WooCommerce payment method
 
 == Description ==
 
-Mulla Payments connects your site to Mulla, the mobile money gateway for Rwanda. Customers choose MTN MoMo or Airtel Money, enter their number, and approve the payment prompt on their phone. No card, no redirect.
+Mulla Payments connects your site to Mulla, the mobile money gateway for Rwanda. Customers choose MTN MoMo or Airtel Money, enter their number, and approve the payment prompt on their phone. No card needed.
+
+Two ways to pay, chosen in the settings:
+
+* **Mulla checkout page** (default): customers are sent to a secure Mulla page to choose their network and approve, then come back to your site.
+* **Phone number on your site**: customers enter their number on your checkout or form and get the prompt directly, without leaving your site.
 
 **WooCommerce**
 
 * "Mobile Money (MTN / Airtel)" payment method for the classic checkout and the block checkout.
-* The order waits on a "Approve the payment on your phone" screen, then moves to Processing as soon as the payment succeeds.
+* After paying, customers see a live status screen; the order moves to Processing as soon as the payment is confirmed.
 * Payments are confirmed by a signed webhook, with automatic status checks as a fallback, so orders are completed even if a webhook is missed.
 * Compatible with High-Performance Order Storage (HPOS).
 * The store currency must be Rwandan franc (RWF).
@@ -74,7 +79,7 @@ Not yet. Refund the customer from the Mulla dashboard.
 
 = What does the shortcode accept? =
 
-`[mulla_pay amount="5000" reason="Membership" button="Pay now"]` charges a fixed amount. Leave out `amount` to let the visitor choose it; `min` sets the lowest accepted amount (default 100 RWF).
+`[mulla_pay amount="5000" reason="Membership" button="Pay now"]` charges a fixed amount. Leave out `amount` to let the visitor choose it; `min` sets the lowest accepted amount (default 100 RWF). Add `flow="onsite"` to collect the phone number on your page instead of sending the visitor to the Mulla checkout page.
 
 = Is any personal data sent to Mulla? =
 
