@@ -2,9 +2,11 @@
 
 /**
  * Plugin Name:       Mulla Payments
- * Plugin URI:        https://github.com/mulla/mulla-wordpress
+ * Plugin URI:        https://github.com/kaykorw/mulla-wordpress-plugin
  * Description:       Accept MTN Mobile Money and Airtel Money in Rwanda with Mulla: a WooCommerce payment method and a [mulla_pay] payment form for any site.
+ * x-release-please-start-version
  * Version:           0.0.1
+ * x-release-please-end
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mulla
@@ -22,7 +24,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('MULLA_PAYMENTS_VERSION', '0.0.1');
+define('MULLA_PAYMENTS_VERSION', '0.0.1'); // x-release-please-version
 define('MULLA_PAYMENTS_FILE', __FILE__);
 
 if (version_compare(PHP_VERSION, '8.1', '<')) {

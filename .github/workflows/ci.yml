@@ -56,6 +56,7 @@ jobs:
       - run: composer cs
       - run: composer analyse
       - run: php -l views/settings-page.php && php -l uninstall.php && php -l mulla-payments.php
+      - run: php bin/sync-version.php --check
       - run: php bin/build-zip.php
       - uses: actions/upload-artifact@v4
         with:

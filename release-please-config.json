@@ -1,0 +1,18 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "bootstrap-sha": "33f3b3c66e48ad831a89e391c47472e1f15ed6ba",
+    "packages": {
+        ".": {
+            "release-type": "php",
+            "package-name": "kayko/mulla-wordpress",
+            "include-component-in-tag": false,
+            "bump-minor-pre-major": true,
+            "changelog-path": "CHANGELOG.md",
+            "extra-files": [
+                { "type": "generic", "path": "mulla-payments.php" },
+                { "type": "generic", "path": "blocks/pay/index.asset.php" },
+                { "type": "generic", "path": "tests/phpstan-constants.php" }
+            ]
+        }
+    }
+}
