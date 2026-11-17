@@ -12,5 +12,5 @@ All notable changes to this project are documented here. The format follows
 - Signed webhook endpoint (`/wp-json/mulla/v1/webhook`) plus WP-Cron status polling as a fallback.
 - Settings page with test/live keys, `wp-config.php` constant overrides, "Test connection" and one-click "Set up webhook".
 - Amount check: an order whose paid amount does not match is put on hold instead of completed.
-- Bundled `mulla/mulla-php` SDK, prefixed to `MullaPayments\Vendor\Mulla` so it cannot clash with other plugins.
+- Bundled `kayko/mulla-php` SDK, prefixed to `MullaPayments\Vendor\Mulla` so it cannot clash with other plugins.
 - Hooks: `mulla_payments_webhook`, `mulla_payments_webhook_{event}`, `mulla_payments_charge_updated`, `mulla_payments_form_payment_succeeded`.

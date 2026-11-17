@@ -13,7 +13,7 @@ declare(strict_types=1);
  * are rewritten too, so static analysis sees the prefixed types.
  */
 
-const SOURCE_PACKAGE = 'mulla/mulla-php';
+const SOURCE_PACKAGE = 'kayko/mulla-php';
 const ORIGINAL_NAMESPACE = 'Mulla';
 const PREFIX = 'MullaPayments\\Vendor\\';
 

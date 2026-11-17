@@ -8,11 +8,11 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Guards bin/prefix-sdk.php: the bundled SDK must live entirely under MullaPayments\Vendor\Mulla,
- * otherwise another plugin shipping mulla/mulla-php could load a conflicting copy.
+ * otherwise another plugin shipping kayko/mulla-php could load a conflicting copy.
  */
 final class PrefixedSdkTest extends TestCase
 {
-    private const DIR = __DIR__ . '/../../vendor-prefixed/mulla/mulla-php/src';
+    private const DIR = __DIR__ . '/../../vendor-prefixed/kayko/mulla-php/src';
 
     public function testEveryFileIsInThePrefixedNamespace(): void
     {

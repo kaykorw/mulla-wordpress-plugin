@@ -1,4 +1,4 @@
-# Mulla Payments for WordPress
+# Mulla for WordPress
 
 Accept MTN Mobile Money and Airtel Money (Rwanda) on WordPress:
 
@@ -33,24 +33,6 @@ add_action('mulla_payments_form_payment_succeeded', function (int $paymentId, $u
 ```
 
 `Event` and `ChargeUpdate` come from the bundled SDK under the `MullaPayments\Vendor\Mulla\` and `MullaPayments\Payments\` namespaces.
-
-## Layout
-
-```
-mulla-payments.php        bootstrap: PHP check, autoloaders, Plugin::boot()
-src/Plugin.php            composition root: builds services, registers modules
-src/Settings/             option + wp-config.php constant overrides
-src/Http/                 WordPressTransport: SDK transport over wp_remote_request
-src/Webhooks/             signed webhook REST route
-src/Payments/             ChargeUpdate, StatusPoller (WP-Cron fallback)
-src/WooCommerce/          gateway, block checkout integration, order handling
-src/Standalone/           [mulla_pay] shortcode/block, payment records (CPT)
-src/Admin/ + views/       settings page
-bin/prefix-sdk.php        copies mulla/mulla-php into vendor-prefixed/ under MullaPayments\Vendor\
-bin/build-zip.php         builds build/mulla-payments-{version}.zip
-```
-
-The SDK is prefixed so that another plugin bundling a different `mulla/mulla-php` version can never conflict. `composer install` runs the prefixer automatically; the plugin itself only loads `vendor-prefixed/`, never `vendor/`.
 
 ## Development
 
@@ -92,7 +74,3 @@ SIG=$(printf '%s' "$BODY" | openssl dgst -sha512 -hmac "<webhook secret>" -hex |
 curl -X POST http://localhost:8888/wp-json/mulla/v1/webhook \
   -H 'content-type: application/json' -H "x-webhook-signature: $SIG" -d "$BODY"
 ```
-
-## License
-
-GPL-2.0-or-later. See [LICENSE](LICENSE).

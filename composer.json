@@ -1,12 +1,12 @@
 {
-    "name": "mulla/mulla-wordpress",
+    "name": "kayko/mulla-wordpress",
     "description": "Mulla Payments for WordPress and WooCommerce: MTN MoMo & Airtel Money in Rwanda.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
-    "homepage": "https://github.com/mulla/mulla-wordpress",
+    "homepage": "https://github.com/kayko/mulla-wordpress",
     "require": {
         "php": ">=8.1",
-        "mulla/mulla-php": "^0.0.1 || dev-main"
+        "kayko/mulla-php": "^0.0.1 || dev-main"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.64",
