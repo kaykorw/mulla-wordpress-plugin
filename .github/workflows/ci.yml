@@ -15,16 +15,6 @@ jobs:
     name: PHP ${{ matrix.php }}
     steps:
       - uses: actions/checkout@v4
-      # Until kayko/mulla-php is on Packagist, the path repository (../mulla-php) supplies it.
-      # mulla-php-sdk is private: MULLA_PHP_TOKEN is a fine-grained token with read access to it.
-      - name: Check out mulla-php
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/mulla-php-sdk
-          token: ${{ secrets.MULLA_PHP_TOKEN }}
-          path: mulla-php
-      - name: Move mulla-php next to this repo
-        run: mv mulla-php ../mulla-php
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -37,16 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # Until kayko/mulla-php is on Packagist, the path repository (../mulla-php) supplies it.
-      # mulla-php-sdk is private: MULLA_PHP_TOKEN is a fine-grained token with read access to it.
-      - name: Check out mulla-php
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/mulla-php-sdk
-          token: ${{ secrets.MULLA_PHP_TOKEN }}
-          path: mulla-php
-      - name: Move mulla-php next to this repo
-        run: mv mulla-php ../mulla-php
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'

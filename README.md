@@ -44,7 +44,7 @@ add_action('mulla_payments_form_payment_succeeded', function (int $paymentId, $u
 
 ## Development
 
-Requires PHP 8.1+, Composer, and `mulla-php` checked out next to this repo (`../mulla-php`) until it is on Packagist.
+Requires PHP 8.1+ and Composer. `kayko/mulla-php` is installed from Packagist.
 
 ```bash
 composer install
