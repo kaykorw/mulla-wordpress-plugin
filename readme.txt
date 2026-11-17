@@ -1,5 +1,5 @@
 === Mulla Payments ===
-Contributors: mulla
+Contributors: kaykorw
 Tags: mobile money, momo, mtn, airtel, woocommerce
 Requires at least: 6.4
 Tested up to: 6.8
