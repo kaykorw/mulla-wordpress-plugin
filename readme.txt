@@ -34,7 +34,7 @@ Two ways to pay, chosen in the settings:
 
 **Built for safety**
 
-* Test mode with sandbox keys: no real money moves.
+* Sandbox environment with `sk_test_` keys: no real money moves.
 * Secret keys can be kept in `wp-config.php` instead of the database.
 * Webhooks are verified with HMAC-SHA512 signatures; payment amounts are checked against the order.
 * Payment confirmation never trusts the browser: the plugin always asks Mulla.
@@ -42,22 +42,22 @@ Two ways to pay, chosen in the settings:
 == Installation ==
 
 1. Install and activate the plugin.
-2. Go to **Mulla → Settings** and paste your secret key (`sk_test_…` for test mode) from the Mulla dashboard (Developers → API keys).
+2. Go to **Mulla → Settings** and paste your secret key (`sk_test_…` for Sandbox) from the Mulla dashboard (Developers → API keys).
 3. Click **Test connection**, then **Set up webhook**. The webhook URL and its secret are configured for you.
 4. WooCommerce: set the currency to RWF, then enable the payment method under **WooCommerce → Settings → Payments → Mulla**.
 5. Other sites: add the **Mulla Pay** block to a page, or the shortcode `[mulla_pay amount="5000" reason="Membership"]`.
 
-When you are ready, switch the mode to **Live** and add your `sk_live_…` key.
+When you are ready, switch the environment to **Production** and add your `sk_live_…` key.
 
 = Keeping keys out of the database =
 
 Add to `wp-config.php` (the matching fields in wp-admin become read-only):
 
-`define( 'MULLA_MODE', 'live' );`
+`define( 'MULLA_MODE', 'production' );`
 `define( 'MULLA_LIVE_SECRET_KEY', 'sk_live_...' );`
 `define( 'MULLA_LIVE_WEBHOOK_SECRET', '...' );`
 
-The test-mode equivalents are `MULLA_TEST_SECRET_KEY` and `MULLA_TEST_WEBHOOK_SECRET`.
+The Sandbox equivalents are `MULLA_TEST_SECRET_KEY` and `MULLA_TEST_WEBHOOK_SECRET`.
 
 == Frequently Asked Questions ==
 

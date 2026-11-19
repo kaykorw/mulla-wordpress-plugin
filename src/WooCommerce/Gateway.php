@@ -136,7 +136,7 @@ final class Gateway extends WC_Payment_Gateway
             echo wp_kses_post(wpautop(wptexturize($this->description)));
         }
         if (!$this->pluginSettings->isLive()) {
-            echo '<p class="mulla-test-mode">' . esc_html__('Test mode: no real money is taken.', 'mulla-payments') . '</p>';
+            echo '<p class="mulla-test-mode">' . esc_html__('Sandbox: no real money is taken.', 'mulla-payments') . '</p>';
         }
         if ($this->flow() === self::FLOW_REDIRECT) {
             echo '<p class="mulla-redirect-note">' . esc_html__('You will be taken to a secure Mulla page to choose MTN or Airtel and approve the payment.', 'mulla-payments') . '</p>';

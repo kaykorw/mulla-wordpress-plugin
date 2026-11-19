@@ -68,7 +68,7 @@ final class BlocksIntegration extends AbstractPaymentMethodType
                 'network' => __('Network', 'mulla-payments'),
                 'phone' => __('Mobile Money number', 'mulla-payments'),
                 'invalidPhone' => __('Enter a valid Rwandan Mobile Money number, e.g. 078 800 0000.', 'mulla-payments'),
-                'testMode' => __('Test mode: no real money is taken.', 'mulla-payments'),
+                'testMode' => __('Sandbox: no real money is taken.', 'mulla-payments'),
                 'redirectNote' => __('You will be taken to a secure Mulla page to choose MTN or Airtel and approve the payment.', 'mulla-payments'),
             ],
         ];

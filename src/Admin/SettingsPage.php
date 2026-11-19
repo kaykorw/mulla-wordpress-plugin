@@ -121,9 +121,9 @@ final class SettingsPage
             $client = $this->clients->client();
             $total = $client->charges->list(['limit' => 1])->total;
             $this->notice('success', sprintf(
-                /* translators: 1: test or live, 2: number of charges */
-                __('Connected to Mulla in %1$s mode. Your account has %2$d charge(s).', 'mulla-payments'),
-                $this->settings->mode(),
+                /* translators: 1: Sandbox or Production, 2: number of charges */
+                __('Connected to Mulla (%1$s). Your account has %2$d charge(s).', 'mulla-payments'),
+                Settings::modeLabel($this->settings->mode()),
                 $total,
             ));
         } catch (MullaException $e) {
@@ -173,6 +173,9 @@ final class SettingsPage
         if (str_contains($hook, self::SLUG) || ($screen !== null && $screen->post_type === 'mulla_payment')) {
             wp_enqueue_style('mulla-payments-admin', plugins_url('assets/css/mulla.css', $this->file), [], MULLA_PAYMENTS_VERSION);
         }
+        if (str_contains($hook, self::SLUG)) {
+            wp_enqueue_script('mulla-payments-settings', plugins_url('assets/js/admin-settings.js', $this->file), [], MULLA_PAYMENTS_VERSION, true);
+        }
     }
 
     /**
@@ -190,8 +193,9 @@ final class SettingsPage
         $value = $this->settings->get($key);
         $locked = $this->settings->isLocked($key);
         $name = Settings::OPTION . '[' . $key . ']';
+        $mode = str_starts_with($key, 'live_') ? 'live' : 'test';
         ?>
-        <tr>
+        <tr data-mulla-mode="<?php echo esc_attr($mode); ?>">
             <th scope="row"><label for="mulla-<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></label></th>
             <td>
                 <?php if ($locked) : ?>

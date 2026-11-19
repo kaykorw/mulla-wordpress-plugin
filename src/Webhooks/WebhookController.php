@@ -52,7 +52,7 @@ final class WebhookController
     {
         $secret = $this->settings->webhookSecret();
         if ($secret === '') {
-            $this->logger->error('Webhook received but no webhook secret is configured for ' . $this->settings->mode() . ' mode (Settings → Mulla Payments).');
+            $this->logger->error('Webhook received but no ' . Settings::modeLabel($this->settings->mode()) . ' webhook secret is configured (Mulla → Settings).');
 
             return new WP_REST_Response(['message' => 'Webhook secret is not configured.'], 500);
         }

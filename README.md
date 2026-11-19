@@ -2,7 +2,7 @@
 
 <!-- x-release-please-start-version -->
 
-> This guide applies to the **Mulla Payments** plugin **0.1.0** (slug `mulla-payments`). See [Versioning and compatibility](#versioning-and-compatibility).
+> This guide applies to the **Mulla Payments** plugin **0.0.1** (slug `mulla-payments`). See [Versioning and compatibility](#versioning-and-compatibility).
 
 <!-- x-release-please-end -->
 
@@ -50,7 +50,7 @@ Mulla Payments lets a WordPress site take **MTN Mobile Money** and **Airtel Mone
 
 ## Installation
 
-**From a zip:** download it from a [GitHub release](https://github.com/kaykorw/mulla-wordpress-plugin/releases), then upload it under Plugins → Add New → Upload Plugin. Once the plugin is approved on WordPress.org, you can also search for "Mulla Payments" there.
+**From WordPress:** Plugins → Add New → search for "Mulla Payments", or upload the zip from a [GitHub release](https://github.com/kaykorw/mulla-wordpress-plugin/releases).
 
 **From source,** for development:
 
@@ -67,7 +67,7 @@ Then copy or link the folder into `wp-content/plugins/`, or use [wp-env](#run-wo
 This uses the sandbox, so no real money moves.
 
 1. **Activate** the plugin.
-2. Go to **Mulla → Settings**, choose **Test** mode and paste your `sk_test_` key.
+2. Go to **Mulla → Settings**, choose **Sandbox** and paste your `sk_test_` key.
 3. Click **Test connection**, then **Set up webhook**. The plugin registers its webhook URL with Mulla and saves the secret.
 4. **WooCommerce:** set the store currency to RWF and enable the method under **WooCommerce → Settings → Payments → Mulla**. Place an order.
    **Any other site:** add `[mulla_pay amount="5000" reason="Test"]` to a page and pay.
@@ -149,12 +149,12 @@ For WooCommerce orders, you can also use WooCommerce's own hooks, such as `wooco
 Define the keys in `wp-config.php`. The matching fields in wp-admin become read-only:
 
 ```php
-define('MULLA_MODE', 'live');
+define('MULLA_MODE', 'production');
 define('MULLA_LIVE_SECRET_KEY', 'sk_live_...');
 define('MULLA_LIVE_WEBHOOK_SECRET', '...');
 ```
 
-See [wp-config.php constants](#wp-configphp-constants) for the test-mode names.
+See [wp-config.php constants](#wp-configphp-constants) for the Sandbox names.
 
 ### Run WordPress locally
 
@@ -207,8 +207,8 @@ Releases are built and deployed by CI (see [Versioning and compatibility](#versi
 Before you switch to real money, check that:
 
 - [ ] your merchant account is approved in the Mulla dashboard;
-- [ ] **Mulla → Settings** is in **Live** mode with an `sk_live_` key, or `MULLA_MODE` and `MULLA_LIVE_SECRET_KEY` are defined;
-- [ ] you clicked **Set up webhook** again in live mode, because test and live webhooks have different secrets;
+- [ ] **Mulla → Settings** is set to **Production** with an `sk_live_` key, or `MULLA_MODE` and `MULLA_LIVE_SECRET_KEY` are defined;
+- [ ] you clicked **Set up webhook** again in Production, because Sandbox and Production webhooks have different secrets;
 - [ ] the site uses HTTPS and its REST API (`/wp-json/`) isn't blocked by a security plugin or firewall;
 - [ ] WP-Cron runs (or a real cron job calls `wp-cron.php`), so the fallback status checks happen;
 - [ ] the WooCommerce store currency is RWF;
@@ -266,13 +266,13 @@ All endpoints are under `/wp-json/mulla/v1/`.
 
 ### wp-config.php constants
 
-| Constant                    | Description                          |
-| --------------------------- | ------------------------------------ |
-| `MULLA_MODE`                | `test` or `live`                     |
-| `MULLA_TEST_SECRET_KEY`     | Test-mode secret key (`sk_test_...`) |
-| `MULLA_TEST_WEBHOOK_SECRET` | Test-mode webhook secret             |
-| `MULLA_LIVE_SECRET_KEY`     | Live-mode secret key (`sk_live_...`) |
-| `MULLA_LIVE_WEBHOOK_SECRET` | Live-mode webhook secret             |
+| Constant                    | Description                                             |
+| --------------------------- | ------------------------------------------------------- |
+| `MULLA_MODE`                | `sandbox` or `production` (`test` and `live` also work) |
+| `MULLA_TEST_SECRET_KEY`     | Sandbox secret key (`sk_test_...`)                      |
+| `MULLA_TEST_WEBHOOK_SECRET` | Sandbox webhook secret                                  |
+| `MULLA_LIVE_SECRET_KEY`     | Production secret key (`sk_live_...`)                   |
+| `MULLA_LIVE_WEBHOOK_SECRET` | Production webhook secret                               |
 
 When a constant is defined, its field in **Mulla → Settings** becomes read-only.
 
@@ -280,12 +280,12 @@ When a constant is defined, its field in **Mulla → Settings** becomes read-onl
 
 | Problem                                              | Likely cause and fix                                                                                                           |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| The payment method doesn't appear at checkout        | The store currency isn't RWF, no secret key is saved for the current mode, or the method is disabled.                          |
+| The payment method doesn't appear at checkout        | The store currency isn't RWF, no secret key is saved for the current environment, or the method is disabled.                   |
 | The `[mulla_pay]` form is missing                    | The plugin isn't configured. Log in as an administrator to see the notice, then add the key in **Mulla → Settings**.           |
 | Orders stay **Pending payment** for a long time      | Webhooks aren't arriving and WP-Cron isn't running. Check **Set up webhook**, and make sure WP-Cron (or a real cron job) runs. |
 | An order is **On hold** after payment                | The amount paid doesn't match the order total. Check the order notes and the payment in the Mulla dashboard.                   |
 | Webhooks return `401` or `403`                       | A security plugin, firewall or basic auth blocks `/wp-json/mulla/v1/webhook`. Allow that path.                                 |
-| Webhooks are rejected after switching mode           | Test and live webhooks have different secrets. Click **Set up webhook** again in the new mode.                                 |
+| Webhooks are rejected after switching environment    | Sandbox and Production webhooks have different secrets. Save, then click **Set up webhook** again.                             |
 | `composer install` doesn't create `vendor-prefixed/` | The prefix script didn't run. Run `composer prefix-namespaces`.                                                                |
 | Refunds                                              | Not supported yet. Refund the customer from the Mulla dashboard.                                                               |
 
@@ -295,7 +295,7 @@ When a constant is defined, its field in **Mulla → Settings** becomes read-onl
 
 | Plugin version | WordPress  | WooCommerce            | PHP  | Tested in CI on        |
 | -------------- | ---------- | ---------------------- | ---- | ---------------------- |
-| 0.1.0          | 6.4 to 7.1 | 8.0 to 11.3 (optional) | 8.1+ | PHP 8.1, 8.2, 8.3, 8.4 |
+| 0.0.1          | 6.4 to 7.1 | 8.0 to 11.3 (optional) | 8.1+ | PHP 8.1, 8.2, 8.3, 8.4 |
 
 <!-- x-release-please-end -->
 
@@ -305,7 +305,7 @@ When a constant is defined, its field in **Mulla → Settings** becomes read-onl
 
 ## Support
 
-- **Store owners:** contact Mulla support through your Mulla dashboard for account and payment questions. Once the plugin is live on WordPress.org, its support forum is another option.
+- **Store owners:** use the plugin's support forum on WordPress.org, or contact Mulla support through your Mulla dashboard for account and payment questions.
 - **Bugs and feature requests:** [open an issue](https://github.com/kaykorw/mulla-wordpress-plugin/issues). Include the plugin, WordPress, WooCommerce and PHP versions (Tools → Site Health → Info), and what you expected to happen. Never paste your API key or webhook secret.
 - **Security problems:** don't open a public issue. Report them privately through the repository's [Security tab](https://github.com/kaykorw/mulla-wordpress-plugin/security).
 

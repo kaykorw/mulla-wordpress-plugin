@@ -36,9 +36,16 @@ final class Settings
         'debug' => 'no',
     ];
 
+    /** 'test' (shown as Sandbox) or 'live' (shown as Production). 'production' and 'sandbox' are accepted too. */
     public function mode(): string
     {
-        return $this->get('mode') === 'live' ? 'live' : 'test';
+        return in_array($this->get('mode'), ['live', 'production'], true) ? 'live' : 'test';
+    }
+
+    /** The name merchants see for a mode: "Sandbox" or "Production". */
+    public static function modeLabel(string $mode): string
+    {
+        return $mode === 'live' ? __('Production', 'mulla-payments') : __('Sandbox', 'mulla-payments');
     }
 
     public function isLive(): bool

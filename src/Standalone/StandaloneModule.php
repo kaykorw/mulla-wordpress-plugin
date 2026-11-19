@@ -147,7 +147,7 @@ final class StandaloneModule
             esc_attr($form),
             $phoneFields,
             esc_html__('Your name (optional)', 'mulla-payments'),
-            $this->settings->isLive() ? '' : '<p class="mulla-test-mode">' . esc_html__('Test mode: no real money is taken.', 'mulla-payments') . '</p>',
+            $this->settings->isLive() ? '' : '<p class="mulla-test-mode">' . esc_html__('Sandbox: no real money is taken.', 'mulla-payments') . '</p>',
             esc_html(sanitize_text_field($atts['button'])),
             esc_attr__('Payment cancelled. You can try again.', 'mulla-payments'),
         );

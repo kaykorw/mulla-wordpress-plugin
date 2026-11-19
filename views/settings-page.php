@@ -33,16 +33,21 @@ defined('ABSPATH') || exit;
         <?php settings_fields(self::GROUP); ?>
         <table class="form-table" role="presentation">
             <tr>
-                <th scope="row"><?php esc_html_e('Mode', 'mulla-payments'); ?></th>
+                <th scope="row"><?php esc_html_e('Environment', 'mulla-payments'); ?></th>
                 <td>
                     <?php $this->lockedNote('mode'); ?>
-                    <label><input type="radio" name="<?php echo esc_attr(Settings::OPTION); ?>[mode]" value="test" <?php checked($mode, 'test'); disabled($this->settings->isLocked('mode')); ?>> <?php esc_html_e('Test (sandbox, no real money)', 'mulla-payments'); ?></label><br>
-                    <label><input type="radio" name="<?php echo esc_attr(Settings::OPTION); ?>[mode]" value="live" <?php checked($mode, 'live'); disabled($this->settings->isLocked('mode')); ?>> <?php esc_html_e('Live', 'mulla-payments'); ?></label>
+                    <fieldset class="mulla-mode">
+                        <legend class="screen-reader-text"><?php esc_html_e('Environment', 'mulla-payments'); ?></legend>
+                        <label class="mulla-mode__option"><input type="radio" name="<?php echo esc_attr(Settings::OPTION); ?>[mode]" value="test" <?php checked($mode, 'test'); disabled($this->settings->isLocked('mode')); ?>> <?php echo esc_html(Settings::modeLabel('test')); ?></label>
+                        <label class="mulla-mode__option"><input type="radio" name="<?php echo esc_attr(Settings::OPTION); ?>[mode]" value="live" <?php checked($mode, 'live'); disabled($this->settings->isLocked('mode')); ?>> <?php echo esc_html(Settings::modeLabel('live')); ?></label>
+                    </fieldset>
+                    <p class="description" data-mulla-mode="test"><?php esc_html_e('No real money moves. Use your sk_test_ key.', 'mulla-payments'); ?></p>
+                    <p class="description" data-mulla-mode="live"><?php esc_html_e('Customers pay real money. Use your sk_live_ key.', 'mulla-payments'); ?></p>
                 </td>
             </tr>
             <?php
-            $this->secretRow('test_secret_key', __('Test secret key', 'mulla-payments'), 'sk_test_…');
-            $this->secretRow('live_secret_key', __('Live secret key', 'mulla-payments'), 'sk_live_…');
+            $this->secretRow('test_secret_key', __('Sandbox secret key', 'mulla-payments'), 'sk_test_…');
+            $this->secretRow('live_secret_key', __('Production secret key', 'mulla-payments'), 'sk_live_…');
             ?>
             <tr>
                 <th scope="row"><?php esc_html_e('Webhook URL', 'mulla-payments'); ?></th>
@@ -57,8 +62,8 @@ defined('ABSPATH') || exit;
                 </td>
             </tr>
             <?php
-            $this->secretRow('test_webhook_secret', __('Test webhook secret', 'mulla-payments'), '');
-            $this->secretRow('live_webhook_secret', __('Live webhook secret', 'mulla-payments'), '');
+            $this->secretRow('test_webhook_secret', __('Sandbox webhook secret', 'mulla-payments'), '');
+            $this->secretRow('live_webhook_secret', __('Production webhook secret', 'mulla-payments'), '');
             ?>
             <tr>
                 <th scope="row"><?php esc_html_e('Debug log', 'mulla-payments'); ?></th>
@@ -80,7 +85,7 @@ defined('ABSPATH') || exit;
         <?php $this->actionButton('mulla_payments_test_connection', __('Test connection', 'mulla-payments')); ?>
         <?php $this->actionButton('mulla_payments_setup_webhook', __('Set up webhook', 'mulla-payments')); ?>
     </p>
-    <p class="description"><?php esc_html_e('"Set up webhook" points your Mulla webhook to this site and saves its secret here.', 'mulla-payments'); ?></p>
+    <p class="description"><?php esc_html_e('"Set up webhook" points your Mulla webhook to this site and saves its secret here. Both tools use the saved environment, so save your changes first after switching.', 'mulla-payments'); ?></p>
 
     <h2><?php esc_html_e('Taking payments', 'mulla-payments'); ?></h2>
     <ul class="ul-disc">

@@ -51,6 +51,11 @@ function wp_remote_request(string $url, array $args = []): array|WP_Error
     return WpStubs::$nextResponse;
 }
 
+function __(string $text, string $domain = 'default'): string
+{
+    return $text;
+}
+
 function esc_html(string $text): string
 {
     return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');

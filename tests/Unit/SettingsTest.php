@@ -54,9 +54,24 @@ final class SettingsTest extends TestCase
 
     public function testUnknownModeFallsBackToTest(): void
     {
-        \WpStubs::$options[Settings::OPTION] = ['mode' => 'production'];
+        \WpStubs::$options[Settings::OPTION] = ['mode' => 'staging'];
 
         self::assertSame('test', (new Settings())->mode());
+    }
+
+    public function testAcceptsTheSandboxAndProductionNames(): void
+    {
+        \WpStubs::$options[Settings::OPTION] = ['mode' => 'production'];
+        self::assertSame('live', (new Settings())->mode());
+
+        \WpStubs::$options[Settings::OPTION] = ['mode' => 'sandbox'];
+        self::assertSame('test', (new Settings())->mode());
+    }
+
+    public function testModeLabels(): void
+    {
+        self::assertSame('Sandbox', Settings::modeLabel('test'));
+        self::assertSame('Production', Settings::modeLabel('live'));
     }
 
     public function testIgnoresACorruptOption(): void
