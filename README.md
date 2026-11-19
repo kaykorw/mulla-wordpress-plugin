@@ -2,7 +2,7 @@
 
 <!-- x-release-please-start-version -->
 
-> This guide applies to the **Mulla Payments** plugin **0.0.1** (slug `mulla-payments`). See [Versioning and compatibility](#versioning-and-compatibility).
+> This guide applies to the **Mulla Payments** plugin **0.1.0** (slug `mulla-payments`). See [Versioning and compatibility](#versioning-and-compatibility).
 
 <!-- x-release-please-end -->
 
@@ -295,7 +295,7 @@ When a constant is defined, its field in **Mulla → Settings** becomes read-onl
 
 | Plugin version | WordPress  | WooCommerce            | PHP  | Tested in CI on        |
 | -------------- | ---------- | ---------------------- | ---- | ---------------------- |
-| 0.0.1          | 6.4 to 7.1 | 8.0 to 11.3 (optional) | 8.1+ | PHP 8.1, 8.2, 8.3, 8.4 |
+| 0.1.0          | 6.4 to 7.1 | 8.0 to 11.3 (optional) | 8.1+ | PHP 8.1, 8.2, 8.3, 8.4 |
 
 <!-- x-release-please-end -->
 
