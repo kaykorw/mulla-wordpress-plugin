@@ -9,9 +9,22 @@
             "bump-minor-pre-major": true,
             "changelog-path": "CHANGELOG.md",
             "extra-files": [
-                { "type": "generic", "path": "mulla-payments.php" },
-                { "type": "generic", "path": "blocks/pay/index.asset.php" },
-                { "type": "generic", "path": "tests/phpstan-constants.php" }
+                {
+                    "type": "generic",
+                    "path": "mulla-payments.php"
+                },
+                {
+                    "type": "generic",
+                    "path": "blocks/pay/index.asset.php"
+                },
+                {
+                    "type": "generic",
+                    "path": "tests/phpstan-constants.php"
+                },
+                {
+                    "type": "generic",
+                    "path": "README.md"
+                }
             ]
         }
     }
